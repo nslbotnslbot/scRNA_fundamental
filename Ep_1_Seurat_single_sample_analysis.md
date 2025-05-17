@@ -1,6 +1,7 @@
 # scRNA_fundamental
 
 ## Step 1: Install the necessary packages
+
 ```
 rm(list = ls())
 
@@ -8,49 +9,33 @@ if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 
 BiocManager::install("multtest")
-
 BiocManager::install("Seurat")
-
 BiocManager::install("SeuratData")
-
 BiocManager::install("dplyr")
-
 BiocManager::install("mindr")
-
 BiocManager::install("tidyverse")
-
 BiocManager::install("remotes")
-
 BiocManager::install("R.utils")
-
 remotes::install_github('satijalab/seurat-data')
 
 library(multtest)
-
 library(Seurat)
-
 library(dplyr)
-
 library(mindr)
-
 library(tidyverse)
-
 library(SeuratData)
-
 library(ggplot2)
-
 library(patchwork)
-
 library(R.utils)
 
 download.file('https://cf.10xgenomics.com/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz','pbmc3k.gz')
-
 untar(gunzip("pbmc3k.gz"))
 ```
 
 ## Step 2 Download sample data or local data#
 
 ### Peripheral Blood Mononuclear Cells (PBMCs) —— 外周血单个核细胞
+```
 ### We try the custom way, Local 10x data##
 pbmc3k.data <- Read10X(data.dir = "./filtered_gene_bc_matrices/hg19/")
 pbmc3k <- CreateSeuratObject(counts = pbmc3k.data, project = "pbmc3k", min.cells = 3, min.features = 200)
@@ -150,4 +135,4 @@ sessionInfo()
 ### 环境确认，可以用
 
 ### 用RDS二进制文件保存，节省空间
-
+```
