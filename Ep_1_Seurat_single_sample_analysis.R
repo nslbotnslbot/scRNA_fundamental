@@ -2,6 +2,8 @@
 
 ## Step 1: Install the necessary packages
 
+Lists of packages I used in this episode.
+
 ```
 rm(list = ls())
 
@@ -27,7 +29,11 @@ library(SeuratData)
 library(ggplot2)
 library(patchwork)
 library(R.utils)
+```
 
+10x genomics have many samples to practice, we chose Peripheral Blood Mononuclear Cells (PBMCs).
+
+```
 download.file('https://cf.10xgenomics.com/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz','pbmc3k.gz')
 untar(gunzip("pbmc3k.gz"))
 ```
@@ -37,17 +43,22 @@ untar(gunzip("pbmc3k.gz"))
 ### Peripheral Blood Mononuclear Cells (PBMCs) —— 外周血单个核细胞
 ```
 ### We try the custom way, Local 10x data##
+
 pbmc3k.data <- Read10X(data.dir = "./filtered_gene_bc_matrices/hg19/")
 pbmc3k <- CreateSeuratObject(counts = pbmc3k.data, project = "pbmc3k", min.cells = 3, min.features = 200)
+
 ### min.cells = how many cell types a gene is expressed in at least, min.features = how many genes a cell expresses at least. Only when the conditions are met will the gene be retained
 
-pbmc3k ###13714 features (genes) across 2700 samples (cells) within 1 assay
+pbmc3k
+###13714 features (genes) across 2700 samples (cells) within 1 assay
+
 ncol(pbmc3k)
 ncol(pbmc3k.data)
 pbmc3k_express_matrix <- as.data.frame(GetAssayData(pbmc3k[["RNA"]], slot = "counts"))### saving the matrix
 write.table(pbmc3k_express_matrix,'testcount.txt', sep = '\t') ### write into the 'txt' file, wasting space
 pbmc3k[["percent.mt"]] <- PercentageFeatureSet(pbmc3k, pattern = "^MT-")
 ### Lowercase "mt" for mouse
+
 head(pbmc3k@meta.data,5)
 
 
