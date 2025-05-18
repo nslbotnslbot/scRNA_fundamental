@@ -50,6 +50,7 @@ pbmc3k <- CreateSeuratObject(counts = pbmc3k.data, project = "pbmc3k", min.cells
 ### min.cells = how many cell types a gene is expressed in at least, min.features = how many genes a cell expresses at least. Only when the conditions are met will the gene be retained
 
 ### Have a glimpse
+
 pbmc3k
 
 ###An object of class Seurat 
@@ -97,7 +98,10 @@ CombinePlots
 
 ```r
 pbmc3k <- subset (pbmc3k, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5)
-### 单细胞基因太少可能质量较差，测序深度或者细胞活性差；细胞基因数量过多可能是双细胞多细胞混合体，并没有形成单细胞悬液
+### Filter
+### nFeature_RNA > 200 for avoiding too few single-cell genes may result in poor quality(sequencing depth or cell viability)
+### nFeature_RNA < 2500 for avoiding excessive number of cell genes which may be a mixture of two cells and multiple cells, and no single-cell suspension has been formed
+### ercent.mt < 5 for selecting genes with high activity in the nucleus
 
 ncol(pbmc3k)
 ### 2638
@@ -243,26 +247,30 @@ pbmc3k.markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
 ### Pass the calculated highly expressed marker genes to the "features" and select the genes with the top n expression levels
 ### For example, I chose them randomly
 FeaturePlot(pbmc3k, features = c("MS4A1", "GNLY", "CD3E", "CD14", "FCER1A", "FCGR3A", "LYZ"))
+```
 ![Fig_12](figs/Fig_12.png)
-
+```r
 top10 <-pbmc3k.markers %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC)
 DoHeatmap(pbmc3k, features = top10$gene) + NoLegend()
-###Website for gene to cells reference:
-
+```
+Website for gene to cells reference:
+CellMarker[CellMarker 2.0](http://www.bio-bigdata.center/index.html)
  
 ![Fig_13](figs/Fig_13.png)
 
+```r
 new.cluster.ids <- c("Naive CD4 T", "CD14+ Mono", "Memory CD4 T", "B", "CD8 T", "FCGR3A+ Mono",
                      "NK", "DC","Platelet")
-### id 重命名
+### id renaming
 
 names(new.cluster.ids) <- levels(pbmc3k)
 pbmc3k <- RenameIdents(pbmc3k, new.cluster.ids)
 DimPlot(pbmc3k, reduction = "umap", label = TRUE, pt.size = 0.5) + NoLegend()
+```
 ![Fig_14](figs/Fig_14.png)
-
+```r
 sessionInfo()
-### 环境确认，可以用
+### Confirm your version and environment
 
-### 用RDS二进制文件保存，节省空间
+### Save space with RDS binary files
 ```
