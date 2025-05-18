@@ -161,40 +161,61 @@ VizDimLoadings(pbmc3k, dims = 1:2, reduction = "pca")
 
 ```r
 DimPlot(pbmc3k, reduction = "pca")
+```
+![Fig_5](figs/Fig_5.png)
+
+```r
 DimHeatmap(pbmc3k, dims = 1 , cells = 500, balanced = TRUE)
+```
+![Fig_6](figs/Fig_6.png)
+```r
 DimHeatmap(pbmc3k, dims = 1:15, cells = 500, balanced = TRUE)
 ```
+![Fig_7](figs/Fig_7.png)
 
 ## Step 6 Perform "hypothesis tests" on each principal component of PCA to generate P-values
 ```r
 pbmc3k <- JackStraw(pbmc3k, num.replicate = 100)
 pbmc3k <- ScoreJackStraw(pbmc3k, dims = 1:20)
 JackStrawPlot(pbmc3k, dims = 1:20)
-ElbowPlot(pbmc3k)
-### 发现维度10左右就稳定了
 ```
+![Fig_8](figs/Fig_8.png)
+```r
+ElbowPlot(pbmc3k)
+```
+![Fig_9](figs/Fig_9.png)
+### 发现维度10左右就稳定了
 
 ## Step 7 Find neighbors
 ```r
 pbmc3k <- FindNeighbors(pbmc3k, dims = 1:10) 
 pbmc3k <- FindClusters(pbmc3k, resolution = 0.5)
-```r
 ### 寻找近邻和集群，resolution 0.4-1.2，越大细胞cluster越多。
+```
 
+```r
 pbmc3k <- RunUMAP(pbmc3k, dims = 1:10)  
 DimPlot(pbmc3k, reduction = "umap")
 ### UMAP降维
+```
+![Fig_10](figs/Fig_10.png)
 
-
+## Optional step: T-SNE dimension reduction is more complex, offering better classification, making it suitable for small data
+```r
 pbmc3k <- RunTSNE(pbmc3k, dims = 1:10)
 DimPlot(pbmc3k, reduction = "tsne")
-### T-SNE降维,更复杂，分类更好，适合小数据
+```
+![Fig_11](figs/Fig_11.png)
 
+
+## Step 8 Find marker genes by DEG analysis
+```r
 cluster5.markers <- FindMarkers(pbmc3k, ident.1 = 5, ident.2 = c(0,3), min.pct = 0.25)
-### 计算所有细胞
+### Find marker genes cluster 5 vs cluster 0 和 3
 
 pbmc3k.markers <- FindAllMarkers(pbmc3k, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
-### 寻找所有markergene
+### Find marker genes for all clusters
+
 pbmc3k.markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
 #### A tibble: 18 × 7
 #### Groups:   cluster [9]
@@ -219,12 +240,17 @@ pbmc3k.markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
 #17 0              12.1  0.615 0     0         8       LY6G6F   
 #18 4.07e-228      12.2  0.462 0     5.58e-224 8       CLDN5    
 
-### 按照计算出的高表达的markergene传递给管道符号，选出表达量top n的基因
+### Pass the calculated highly expressed marker genes to the "features" and select the genes with the top n expression levels
+### For example, I chose them randomly
 FeaturePlot(pbmc3k, features = c("MS4A1", "GNLY", "CD3E", "CD14", "FCER1A", "FCGR3A", "LYZ"))
+![Fig_12](figs/Fig_12.png)
 
 top10 <-pbmc3k.markers %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC)
 DoHeatmap(pbmc3k, features = top10$gene) + NoLegend()
-### 用来参考细胞高表达基因的网络
+###Website for gene to cells reference:
+
+ 
+![Fig_13](figs/Fig_13.png)
 
 new.cluster.ids <- c("Naive CD4 T", "CD14+ Mono", "Memory CD4 T", "B", "CD8 T", "FCGR3A+ Mono",
                      "NK", "DC","Platelet")
@@ -233,6 +259,7 @@ new.cluster.ids <- c("Naive CD4 T", "CD14+ Mono", "Memory CD4 T", "B", "CD8 T", 
 names(new.cluster.ids) <- levels(pbmc3k)
 pbmc3k <- RenameIdents(pbmc3k, new.cluster.ids)
 DimPlot(pbmc3k, reduction = "umap", label = TRUE, pt.size = 0.5) + NoLegend()
+![Fig_14](figs/Fig_14.png)
 
 sessionInfo()
 ### 环境确认，可以用
