@@ -2,4 +2,4 @@
 
 ## 1. Installation
 ```bash
-conda install -c bioconda cellsnp-lite
+mamba install -c bioconda cellsnp-lite
