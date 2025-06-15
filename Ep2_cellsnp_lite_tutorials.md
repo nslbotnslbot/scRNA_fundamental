@@ -1,4 +1,4 @@
-# Cellsnp-lite
+# cellsnp-lite
 
 ## 0. Set the environment and installation
 ```bash
